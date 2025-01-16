@@ -10,11 +10,16 @@ import GObject from 'gi://GObject';
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 import {SystemIndicator} from 'resource:///org/gnome/shell/ui/quickSettings.js';
 
+import {Extension} from 'resource:///org/gnome/shell/extensions/extension.js';
+
 
 const PowerProfileIndicator = GObject.registerClass(
 class PowerProfileIndicator extends SystemIndicator {
-    _init() {
+    _init(settings) {
         super._init();
+
+        this._settings = settings;
+        this._settings.connectObject('changed', this._setIcon.bind(this), this);
 
         this._indicator = this._addIndicator();
 
@@ -37,7 +42,7 @@ class PowerProfileIndicator extends SystemIndicator {
         if (this._activeProfile)
             this._indicator.remove_style_class_name(this._activeProfile);
         this._activeProfile = this._powerProfileToggle._proxy?.ActiveProfile;
-        if (this._activeProfile)
+        if (this._settings.get_boolean('colored-icon') && this._activeProfile)
             this._indicator.add_style_class_name(this._activeProfile);
     }
 
@@ -66,6 +71,9 @@ class PowerProfileIndicator extends SystemIndicator {
     }
 
     _destroy() {
+        this._settings.disconnectObject(this);
+        this._settings = null;
+
         if (this._timeout) {
             GLib.Source.remove(this._timeout);
             this._timeout = null;
@@ -83,9 +91,13 @@ class PowerProfileIndicator extends SystemIndicator {
     }
 });
 
-export default class PowerProfileIndicatorExtension {
+export default class PowerProfileIndicatorExtension extends Extension {
+    constructor(metadata) {
+        super(metadata);
+    }
+
     enable() {
-        this._indicator = new PowerProfileIndicator();
+        this._indicator = new PowerProfileIndicator(this.getSettings());
         Main.panel.statusArea.quickSettings.addExternalIndicator(this._indicator);
     }
 
