@@ -47,7 +47,7 @@ class PowerProfileIndicator extends SystemIndicator {
     }
 
     _setPowerMode(profile) {
-        if (this._powerProfileToggle._proxy)
+        if (this._powerProfileToggle?._proxy)
             this._powerProfileToggle._proxy.ActiveProfile = profile;
     }
 
@@ -79,10 +79,9 @@ class PowerProfileIndicator extends SystemIndicator {
             this._timeout = null;
         }
 
-        if (this._powerProfileToggle) {
-            this._powerProfileToggle._proxy?.disconnectObject(this);
-            this._powerProfileToggle = null;
-        }
+        this._powerProfileToggle?.disconnectObject(this);
+        this._powerProfileToggle?._proxy?.disconnectObject(this);
+        this._powerProfileToggle = null;
 
         this._indicator.destroy();
         this._indicator = null;
