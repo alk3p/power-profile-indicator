@@ -16,7 +16,7 @@ import {Extension} from 'resource:///org/gnome/shell/extensions/extension.js';
 const PowerProfileIndicator = GObject.registerClass(
 class PowerProfileIndicator extends SystemIndicator {
     _init(settings) {
-        super._init();
+        super._init(0.5);
 
         this._settings = settings;
         this._settings.connectObject('changed', this._setIcon.bind(this), this);
@@ -24,24 +24,24 @@ class PowerProfileIndicator extends SystemIndicator {
         this._indicator = this._addIndicator();
 
         this._timeout = GLib.idle_add(GLib.PRIORITY_DEFAULT_IDLE, () => {
-            this._powerProfileToggle = Main.panel.statusArea.quickSettings._powerProfiles.quickSettingsItems[0];
-            if (this._powerProfileToggle) {
-                this._powerProfileToggle._proxy?.connectObject('g-properties-changed', this._setIcon.bind(this), this);
-                this._setIcon();
+            this._powerProfileToggle = Main.panel.statusArea.quickSettings?._powerProfiles?.quickSettingsItems[0];
+            this._setIcon();
 
-                this.connectObject('scroll-event', (actor, event) => this._onScrollEvent(event), this);
-            }
+            this._powerProfileToggle?.connectObject('notify::visible', this._setIcon.bind(this), this);
+            this._powerProfileToggle?._proxy?.connectObject('g-properties-changed', this._setIcon.bind(this), this);
+
+            this.connectObject('scroll-event', (actor, event) => this._onScrollEvent(event), this);
 
             return GLib.SOURCE_REMOVE;
         });
     }
 
     _setIcon() {
-        this._indicator.icon_name = this._powerProfileToggle.icon_name;
+        this._indicator.icon_name = this._powerProfileToggle?.icon_name;
 
         if (this._activeProfile)
             this._indicator.remove_style_class_name(this._activeProfile);
-        this._activeProfile = this._powerProfileToggle._proxy?.ActiveProfile;
+        this._activeProfile = this._powerProfileToggle?._proxy?.ActiveProfile;
         if (this._settings.get_boolean('colored-icon') && this._activeProfile)
             this._indicator.add_style_class_name(this._activeProfile);
     }
@@ -52,7 +52,7 @@ class PowerProfileIndicator extends SystemIndicator {
     }
 
     _onScrollEvent(event) {
-        let availableProfiles = this._powerProfileToggle._proxy?.Profiles.map(p => p.Profile.unpack()).reverse();
+        let availableProfiles = this._powerProfileToggle?._proxy?.Profiles.map(p => p.Profile.unpack()).reverse();
         let activeProfileIndex = availableProfiles.indexOf(this._activeProfile);
         let newProfile = this._activeProfile;
 
