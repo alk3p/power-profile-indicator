@@ -27,9 +27,7 @@ class PowerProfileIndicator extends SystemIndicator {
             this._powerProfileToggle = Main.panel.statusArea.quickSettings?._powerProfiles?.quickSettingsItems[0];
             this._setIcon();
 
-            this._powerProfileToggle?.connectObject('notify::visible', this._setIcon.bind(this), this);
-            this._powerProfileToggle?._proxy?.connectObject('g-properties-changed', this._setIcon.bind(this), this);
-
+            this._powerProfileToggle?.connectObject('notify::icon-name', this._setIcon.bind(this), this);
             this.connectObject('scroll-event', (actor, event) => this._onScrollEvent(event), this);
 
             return GLib.SOURCE_REMOVE;
@@ -80,7 +78,6 @@ class PowerProfileIndicator extends SystemIndicator {
         }
 
         this._powerProfileToggle?.disconnectObject(this);
-        this._powerProfileToggle?._proxy?.disconnectObject(this);
         this._powerProfileToggle = null;
 
         this._indicator.destroy();
