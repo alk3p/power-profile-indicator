@@ -16,7 +16,7 @@ import {Extension} from 'resource:///org/gnome/shell/extensions/extension.js';
 const PowerProfileIndicator = GObject.registerClass(
 class PowerProfileIndicator extends SystemIndicator {
     _init(settings) {
-        super._init(0.5);
+        super._init();
 
         this._settings = settings;
         this._settings.connectObject('changed', this._setIcon.bind(this), this);
