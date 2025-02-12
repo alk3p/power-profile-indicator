@@ -29,7 +29,9 @@ class PowerProfileIndicator extends SystemIndicator {
 
             this._powerProfileToggle?.connectObject('notify::icon-name', this._setIcon.bind(this), this);
             this.connectObject('scroll-event', (actor, event) => this._onScrollEvent(event), this);
+            this.connectObject('destroy', this._destroy.bind(this), this);
 
+            this._timeout = null;
             return GLib.SOURCE_REMOVE;
         });
     }
@@ -98,7 +100,7 @@ export default class PowerProfileIndicatorExtension extends Extension {
     }
 
     disable() {
-        this._indicator._destroy();
+        this._indicator?.destroy();
         this._indicator = null;
     }
 }
