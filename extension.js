@@ -62,11 +62,11 @@ class PowerProfileIndicator extends SystemIndicator {
         let newProfile = this._activeProfile;
 
         switch (event.get_scroll_direction()) {
-            case Clutter.ScrollDirection.UP:
+            case Clutter.ScrollDirection.DOWN:
                 newProfile = availableProfiles[Math.max(activeProfileIndex - 1, 0)];
                 this._setPowerMode(newProfile);
                 break;
-            case Clutter.ScrollDirection.DOWN:
+            case Clutter.ScrollDirection.UP:
                 newProfile = availableProfiles[Math.min(activeProfileIndex + 1, availableProfiles.length - 1)];
                 this._setPowerMode(newProfile);
                 break;
