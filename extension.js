@@ -13,6 +13,12 @@ import {SystemIndicator} from 'resource:///org/gnome/shell/ui/quickSettings.js';
 import {Extension} from 'resource:///org/gnome/shell/extensions/extension.js';
 
 
+const PROFILE_ICONS = {
+  "performance": "power-profile-performance-symbolic",
+  "balanced": "power-profile-balanced-symbolic",
+  "power-saver": "power-profile-power-saver-symbolic"
+};
+
 const PowerProfileIndicator = GObject.registerClass(
 class PowerProfileIndicator extends SystemIndicator {
     _init(settings) {
@@ -37,11 +43,10 @@ class PowerProfileIndicator extends SystemIndicator {
     }
 
     _setIcon() {
-        this._indicator.icon_name = this._powerProfileToggle?.icon_name;
-
         if (this._activeProfile)
             this._indicator.remove_style_class_name(this._activeProfile);
         this._activeProfile = this._powerProfileToggle?._proxy?.ActiveProfile;
+        this._indicator.icon_name = PROFILE_ICONS[this._activeProfile];
         if (this._settings.get_boolean('colored-icon') && this._activeProfile)
             this._indicator.add_style_class_name(this._activeProfile);
     }
